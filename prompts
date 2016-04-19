@@ -77,9 +77,9 @@ USER_COL=$(rand_col $(whoami))
 #    ROOT_COL="$(C 1)"
 #    USER_COL="31;1"
 #  ;;
-#  jezz)
+#  hoel)
 #    USER_COL="36" ;;
-#  pouill_j)
+#  hvasseur)
 #    USER_COL="35" ;;
 #  calvair|acu2005|acu)
 #    USER_COL="32" ;;
