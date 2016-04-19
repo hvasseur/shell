@@ -1,0 +1,343 @@
+# kate: hl zsh; space-indent on; indent-width 4;
+##-*-sh-*-#
+# Aliases #
+###########
+
+function shell_is {
+    [[ "$1" = "zsh" && -n "$ZSH_VERSION" ]] && return 0
+    [[ "$1" = "bash" && -n "$BASH_VERSION" ]] && return 0
+    return 1
+}
+
+# Global
+if shell_is zsh; then
+    alias -g  T="| tail"
+    alias -g  H="| head"
+    alias -g  S="| sort"
+    alias -g  V="| vless"
+    alias -g  W="| wc -l"
+    alias -g  G="| grep"
+    alias -g GG="|& grep"
+    alias -g  L="| $PAGER"
+    alias -g LL="|& $PAGER"
+    alias -g  R="| sudo tee > /dev/null"
+    alias -g RR="| sudo tee -a > /dev/null"
+    alias -g  N="> /dev/null"
+    alias -g NN="> /dev/null 2>&1"
+
+    # Automaticly expand global aliases
+    #  $ cat log G<Space>
+    # will be expanded to
+    #  $ cat log | grep
+    expand_abbrev() {
+        local MATCH
+        # Zsh does not remove trailing slash if LBUFFER is modified (a bug?). 
+        # So we carefully modify LBUFFER if needed only
+        : ${LBUFFER%%(#m)[^ ]#}
+        if [[ -n "${galiases[$MATCH]}" ]]; then
+            LBUFFER=${LBUFFER%%$MATCH}${galiases[$MATCH]}
+        fi
+        zle self-insert
+    }
+    expand_abbrev_and_accept() {
+        local MATCH
+        # Zsh does not remove trailing slash if LBUFFER is modified (a bug?). 
+        # So we carefully modify LBUFFER if needed only
+        : ${LBUFFER%%(#m)[^ ]#}
+        if [[ -n "${galiases[$MATCH]}" ]]; then
+            LBUFFER=${LBUFFER%%$MATCH}${galiases[$MATCH]}
+        fi
+        zle accept-line
+    }
+
+    zle -N expand_abbrev
+    zle -N expand_abbrev_and_accept
+    bindkey -M emacs ' ' expand_abbrev
+    bindkey -M emacs '^M' expand_abbrev_and_accept
+    bindkey -M emacs '^J' expand_abbrev_and_accept
+    bindkey -M isearch " " self-insert
+
+    # Directories  
+    alias -g    ...=../..
+    alias -g   ....=../../..
+    alias -g  .....=../../../..
+    alias -g ......=../../../../..
+    alias       cd/='cd /'
+elif shell_is bash; then 
+    alias G='grep'
+    alias M='more'
+    alias L='less'
+    alias W='wc -l'
+    alias S='sort'
+    # Directory aliases
+    alias     ..='cd ..'
+    alias    ...='cd ../..'
+    alias   ....='cd ../../..'
+    alias  .....='cd ../../../..'
+    alias ......='cd ../../../../..'
+else 
+    echo "Warning: Cannot found your shell"
+fi
+
+# Protect these commands
+alias     cp="cp -i"
+alias     mv="mv -i"
+alias     rm="rm --one-file-system"
+alias getown="sudo chown -R $(id -nu)"
+alias    abs="readlink -f"
+
+#Show progress while file is copying
+#
+## Rsync options are:
+## -p - preserve permissions
+## -o - preserve owner
+## -g - preserve group
+## -h - output in human-readable format
+## --progress - display progress
+## -b - instead of just overwriting an existing file, save the original
+## --backup-dir=/tmp/rsync - move backup copies to "/tmp/rsync"
+## -e /dev/null - only work on local files
+## -- - everything after this is an argument, even if it looks like an option
+alias cpv="rsync -poghb --backup-dir=/tmp/rsync -e /dev/null --progress --"
+
+alias     xcopy='xsel --clipboard --input'
+alias  xselcopy='xsel --input'
+alias    xpaste='xsel --clipboard --output'
+alias xselpaste='xsel --output'
+
+clean() {
+    [[ $# -eq 0 ]] && TARGET="."
+    for DIR in $TARGET "$@"; do
+        [[ -d "$DIR" ]] && rm -f "$DIR"/*~ "$DIR"/\#* "$DIR"/a.out "$DIR"/svn-commit.tmp* "$DIR"/*.lnk "$DIR"/\~\$*
+    done
+}
+
+alias    latex="mkdir out; latex -output-directory out -halt-on-error -file-line-error"
+alias pdflatex="mkdir out; pdflatex -output-directory out -halt-on-error -file-line-error"
+
+clean_tex() {
+    [[ $# -eq 0 ]] && TARGET="."
+    for DIR in $TARGET "$@"; do
+        if [[ -d "$DIR" ]]; then
+            rm -f "$DIR"/missfont.log "$DIR"/*.aux
+            rm -f "$DIR"/*.out "$DIR"/*.log "$DIR"/*.thm "$DIR"/*.nav
+            #for i in "$DIR"/*.pdf; do
+            #    for j in log aux toc mtc\* thm out nav bbl snm vrb; do
+            #        rm -f ${${i%.tex}%.pdf}.$j
+            #    done
+            #done
+        fi
+    done
+}
+
+# ls aliases
+if [[ "$TERM" != dumb ]]; then
+  alias ls="ls -pF --color=auto"
+else
+  alias ls="ls -pF"
+fi
+alias   l="ls -lh"
+alias  lh="ls -lh"
+alias  la="ls -a"
+alias  ll="ls -alh"
+alias lla="ls -al"
+
+#nano
+#alias nano="nano -c -B -C=/home/hoel/.nano_backup -i" #i for indentation
+
+# Wine
+office() {
+    P="$1"
+    shift
+    ARGS=()
+    for i in "$@"; do 
+        ARGS+=( "$(winepath -w $i)" ); 
+    done
+    for i in "$ARGS[@]"; do 
+        echo -E "$i"; 
+    done
+    wine ~/.wine/drive_c/Program\ Files/Microsoft\ Office/Office12/$P.EXE "$ARGS[@]"
+}
+ 
+alias        msExcel="office EXCEL"
+alias         msWord="office WINWORD"
+alias   msPowerPoint="office POWERPNT"
+alias      msOutlook="office OUTLOOK"
+alias       msAccess="office ACCESS"
+alias      msOneNote="office ONENOTE"
+alias    msPublisher="office MSPUB"
+alias        msVisio="office VISIO"
+
+# Other aliases
+alias hsync="fc -RI"
+alias hgrep="fc -f -l -65535 | grep -i --color"
+if [[ "$TERM" != dumb ]]; then
+  alias minicom="minicom -m -w --color=on"
+fi
+
+
+if [[ "$TERM" != dumb ]]; then                                                  
+  alias  grep="grep --exclude=*~ --exclude-dir=.git --exclude-dir=.svn --color=auto"
+else 
+  alias  grep="grep --exclude=*~ --exclude-dir=.git --exclude-dir=.svn"
+fi
+alias   cgrep="grep --color=always"
+alias   jmake="time nice make -j$(grep -c '^processor' /proc/cpuinfo)"
+alias     end="kdialog --passivepopup \"Action finished with exit code \$?\" 20" 
+alias     ssh="ssh -AX -R 10022:localhost:22"
+alias      pxx="ps --forest -A -o pid,policy,stat,wchan,psr,%cpu,vsz,rss,user,cmd"
+alias       px="ps --forest -A -o pid,stat,%cpu,%mem,user,cmd"
+alias       h="history"
+alias     hex="printf '0x%08X\n'"
+alias    emacs="command emacs --no-window-system --no-splash"
+# Pas de --reverse-video, utiliser les color-theme d'emacs plutot
+alias   xemacs="command emacs --no-splash"
+# Pour utiliser avec le mode emacs-server
+semacs() {
+  xemacs "$@" &!
+}
+
+# Take last version of vim
+for i in /usr/share/vim/vim??/macros/less.sh; do
+  alias vless=$i
+  shell_is zsh && compdef _vim $i
+done
+
+cfind() {
+  find "$@" -print0 | xargs -0 ls --color=auto -d 
+}
+shell_is zsh && compdef find cfind
+
+alias agdb="gdb --args"
+alias xgdb="gdb -ex=r --args"
+
+backup() {
+  [[ $# -eq 1 ]] || echo "usage: $0 FILE"
+  FILE="$1"
+  EXT=
+  [[ $FILE =~ \\.[[:alnum:]]{1,5}$ ]] && EXT="${MATCH}"
+  BASE="${FILE%$EXT}"
+  DEST="${BASE}_$(date +%Y%m%d)$EXT"
+  cp -a "$FILE" "$DEST"
+  chmod -R a-w "$DEST"
+}
+
+# My cat run "ls" if $1 is a directory
+cat() {
+  [[ $# -eq 1 && -d $1 ]] && ls $1 || command cat "$@"
+}
+
+urlencode() {
+  setopt localoptions extendedglob
+  input=( ${(s::)1} )
+  print ${(j::)input/(#b)([^A-Za-z0-9_.--version\'\(\)-])/%$(([##16]#match))}
+}
+
+# Thèmes intéressants: xoria256 zmrok night darkspectrum breeze camo
+alias 2ansi="highlight -s night -O xterm256"
+alias 2html="highlight -s night -O html"
+alias  2rtf="highlight -s night -O rtf"
+
+
+# the trailing space causes the next word to be checked for alias expansion
+#alias sudo="sudo SSH_TTY=$SSH_TTY SSH_AUTH_SOCK=$SSH_AUTH_SOCK "
+# TODO: Add these lines in /etc/sudoers instead
+# Defaults env_keep += "SSH_TTY"
+# Defaults env_keep += "SSH_AUTH_SOCK"
+#sudo() {
+#  command sudo SSH_TTY=$SSH_TTY SSH_AUTH_SOCK=$SSH_AUTH_SOCK "$@"
+#}
+alias sudo="sudo "
+
+brTest() {
+  ID=$1
+  shift
+  mkdir $ID
+  wget http://autobuild.buildroot.net/results/$ID/config -O $ID/.config
+  sed -i -e 's|BR2_DL_DIR=.*|BR2_DL_DIR="'$HOME/dl'"|'  $ID/.config
+  if [[ $# -eq 0 ]]; then
+    make O=$ID |& tee $ID/log
+  elif [[ $1 == "-" ]]; then
+   echo "run make O=$ID toolchain |& tee $ID/log to launch compilation"
+  else
+    make O=$ID toolchain $@ |& tee $ID/log
+  fi
+}
+
+
+# Template system
+copy_expand() {
+    LINE=$(perl -ne 'print $. if /\$CURSOR/' "$1")
+    echo "${(e)$(cat "$1"; echo '$__NOT_EXIST__')}" > "$2"
+    [[ -x "$1" ]] && chmod +x "$2"
+    echo "Edit with :"
+    echo "  ${=EDITOR:-subl3} \"$2\" -l $LINE"
+}
+
+shell_is zsh && TPL_DIR=${$(print -P "%x"):A:h}/templates
+shell_is bash && TPL_DIR=$(dirname $(readlink -f $BASH_SOURCE))/templates
+
+new() {
+    OUT="$1"
+    if [[ -e "$OUT" ]]; then
+        echo "$OUT already exist" >&2
+        return 1
+    fi
+    FILE=$(basename "$OUT")
+    FILE_UP=$(echo $FILE | tr 'a-z-. ' 'A-Z___')
+    EXT=${FILE#*.}
+    DIR=${$(basename $(dirname $(readlink -f "$OUT")))#/}
+    DIR_UP=$(echo $DIR | tr 'a-z-. ' 'A-Z___')
+    if [[ -e "$TPL_DIR/$FILE" ]]; then
+        copy_expand "$TPL_DIR/$FILE" "$OUT"
+    elif [[ -e "$TPL_DIR/file.$EXT" ]]; then
+        copy_expand "$TPL_DIR/file.$EXT" "$OUT"
+    else
+        echo "Cannot find templates for $OUT." >&2
+        touch $OUT
+    fi
+}
+
+#create a cmake project
+mkprj() {
+      OUT="$1"
+      if [[ -e "$OUT" ]]; then
+        echo "$OUT already exist" >&2
+        return 1
+      fi
+      PROJECT_DIR=$(basename "$OUT")
+      BIN_DIR=$PROJECT_DIR/bin
+      DEBUG_DIR=$BIN_DIR/Debug
+      REL_DIR=$BIN_DIR/Release
+      SRC_DIR=$PROJECT_DIR/src
+      INC_DIR=$PROJECT_DIR/include
+      mkdir $PROJECT_DIR $BIN_DIR $SRC_DIR $INC_DIR $DEBUG_DIR $REL_DIR
+      FILE=CMakeLists.txt
+      copy_expand $TPL_DIR/$FILE $PROJECT_DIR/CMakeLists.txt
+      new "$SRC_DIR/main.c"
+      cd $1
+      echo "Build the project with the generator of your choice"
+      echo "Run"
+      echo "    cmake -G"
+      echo "To see the generators available on your system"
+}
+
+#cmake aliases
+alias cmakedebug='cmake $1 -DCMAKE_BUILD_TYPE=DEBUG' #build a debug version for project
+alias cmakerelease='cmake $1 -DCMAKE_BUILD_TYPE=RELEASE' #build a release version for project
+
+
+# Project Root
+pr() {
+    git rev-parse --show-toplevel
+}
+
+# CD Project Root
+cdpr() {
+    cd $(pr)
+}
+
+
+
+
+

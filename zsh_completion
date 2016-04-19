@@ -1,0 +1,106 @@
+#####-*-sh-*-#
+# Completion #
+##############
+
+fpath=($fpath "${$(print -P "%x"):A:h}/zsh_completion_extra")
+autoload -Uz compinit
+compinit
+
+# Hints:
+## Define a function to call when complete a command:
+# compdef function command
+#
+## Example
+# f() {
+#   _arguments -s '-o[Help message]' '-a[Help]:Arg name:_files' ':Mandatory files as argument:_files'
+# }
+# compdef f command
+#
+## When your command is GNU compliant (when --help work perfectly):
+# compdef _gnu_generic command
+#
+## You also may "inline" function
+# compdef '_files -g "*.pdf"' okular
+#
+# To enable autoloading of completion functions:
+#   - Create a file _command somewhere in $fpath
+#   - First line must be #compdef command
+#   - Copy body of f function inside
+#
+# See http://tar-jx.bz/notes/zsh-completion.html
+
+compdef _gnu_generic CHevcDecApp
+compdef _gnu_generic repoquery
+compdef _gnu_generic ctags
+
+_force_rehash() {
+      ((CURRENT == 1)) && rehash
+      return 1        # Because we didn't really complete anything
+}
+
+# The following lines were added by compinstall
+
+zstyle ':completion:*' add-space true
+zstyle ':completion:*' auto-description '%d'
+# zstyle ':completion:*' call-command true
+zstyle ':completion:*' completer _oldlist _expand _force_rehash _complete _ignored _match _correct _approximate _prefix:-complete _prefix:-correct _prefix:-approximate 
+zstyle ':completion:*' expand prefix suffix
+zstyle ':completion:*' file-sort name
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' ignore-parents parent
+zstyle ':completion:*' insert-unambiguous true
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-suffixes true
+zstyle ':completion:*' matcher-list '+' '+m:{a-zA-Z}={A-Za-z}' '+r:|[._-/]=** r:|=**' '+l:|=* r:|=*'
+zstyle ':completion:*' match-original both
+zstyle ':completion:*' menu select=4
+zstyle ':completion:*' original true
+zstyle ':completion:*' preserve-prefix '//[^/]##/'
+zstyle ':completion:*' prompt '%{[33m%}-=> %{[1m%}%d (%e errors in %o)%{[0m%}'
+zstyle ':completion:*' select-prompt '%{[34m%}Scrolling active: current selection at %l (%p)%{[0m%}'
+zstyle ':completion:*' squeeze-slashes true
+zstyle ':completion:*' use-compctl false
+zstyle ':completion:*' verbose true
+zstyle :compinstall filename '${HOME}/conf/shell/zsh_completion'
+
+# End of lines added by compinstall
+
+zstyle ':completion:*:approximate:*'      max-errors 'reply=( $(( ($#PREFIX+$#SUFFIX)/3 )) numeric )'
+zstyle ':completion:*:complete:*'         use-cache 1
+zstyle ':completion:*:history:*'          remove-all-dups yes
+zstyle ':completion:*'                    format '%{[32m%}-=> %{[1m%}%d%{[0m%}'
+zstyle ':completion:*:warnings'           format '%{[31m%}-=> %{[1m%}No matches for: %d%{[0m%}'
+zstyle ':completion:*:corrections'        format '%{[33m%}-=> %{[1m%}%d (%e errors in %o)%{[0m%}'
+zstyle ':completion:*:processes'          command ps --forest -A -o pid,user,cmd
+zstyle ':completion:*:processes'          sort false
+# cf. http://zshwiki.org/home/examples/compsys/colors
+zstyle ':completion:*:processes'          list-colors '=(#b) #([0-9]#) #([^ ]#)[\\_| ]#([^ ]#)*=01;30=32=01;34=01;37'
+zstyle ':completion:*:processes'          menu yes select
+zstyle ':completion:*:processes-names'    command  'ps -e -o command | uniq'
+
+
+# Notes:
+#   ${(f)"STRING"} split STRING at newline
+#   ${${(f)"STRING"}:#PATTERN} syntax allow to filter out lines in STRING that match with PATTERN
+#   ${(M)${(f)"STRING"}:#PATTERN} syntax allow to filter lines in STRING that match with PATTERN
+[ -r $HOME/.ssh/config ]        &&    _ssh_config=( ${${${(M)${(f)"$(<$HOME/.ssh/config)"}:#Host *}##Host }##[*0-9]*} ) || _ssh_config=( )
+[ -r $HOME/.ssh/known_hosts ]   &&     _ssh_hosts=( ${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#\|*}%%\ *}%%,*} )       || _ssh_hosts=( )
+[ -r /etc/ssh/ssh_known_hosts ] && _etc_ssh_hosts=( ${${${${(f)"$(</etc/ssh/ssh_known_hosts)"}:#\|*}%%\ *}%%,*} )     || _etc_ssh_hosts=( )
+[ -r /etc/hosts ]               &&     _etc_hosts=( ${=${${(f)"$(</etc/hosts)"}:#\#*}##[:blank:]#[^[:blank:]]#} )     || _etc_hosts=( )
+hosts=(
+  "$_ssh_config[@]"
+  "$_etc_ssh_hosts[@]"
+  "$_ssh_hosts[@]"
+  "$_etc_hosts[@]"
+  "$HOST"
+  localhost
+)
+zstyle ':completion:*'             hosts $hosts
+zstyle ':completion:*:hosts'       list-colors '=(#b)(*)=01;30' '=[^.]#=01;31'
+
+users=(root hoel)
+zstyle ':completion:*'             users ${users}
+
+
+
+

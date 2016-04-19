@@ -1,0 +1,82 @@
+##############-*-sh-*-#
+# Title configuration #
+#######################
+
+# cf http://www.faqs.org/docs/Linux-mini/Xterm-Title.html
+
+function shell_is {
+    [[ "$1" = "zsh" && -n "$ZSH_VERSION" ]] && return 0
+    [[ "$1" = "bash" && -n "$BASH_VERSION" ]] && return 0
+    return 1
+}
+
+# Place current user and hostname in window title
+# It seems it does not work. Worse, gnome-terminal does not recognize it
+#case $TERM in 
+#    dumb|emacs|eterm*)
+#	;;
+#    screen)
+#	;;
+#    xterm*|rxvt)
+#	if shell_is bash; then
+#            echo -ne "\e]30;${USER}@${HOSTNAME}\a"
+#	elif shell_is zsh; then
+#            print -nP "\e]30;%n@%M\a"
+#	fi
+#	;;
+#esac
+
+
+if shell_is bash; then
+    PROMPT_COMMAND='history -a'
+    if [[ -n "$SSH_TTY" ]]; then
+        DATA="${HOSTNAME}:${PWD}"
+    else
+        DATA="${PWD}"
+    fi
+
+    case $TERM in
+	dumb|emacs|eterm*)
+	    ;;
+	screen)
+            PROMPT_COMMAND+='; echo -ne "\ek${DATA}\e\\"'
+	    ;;
+	xterm*|rxvt|sun-cmd)
+            PROMPT_COMMAND+='; echo -ne "\e]0;${DATA}\a"'
+	    ;;
+    esac
+fi
+
+if shell_is zsh; then
+
+# Place current dir or command in window title
+function title {
+    case $TERM in    
+	dumb|emacs|eterm*)
+	    ;;
+	screen)
+            print -nP "\ek$1\e\\" 
+	    ;;
+	xterm*|rxvt|sun-cmd)
+            print -nP "\e]0;$1\a"
+	    ;;
+    esac
+}
+
+function precmd_title {
+    if [[ -n "$SSH_TTY" ]]; then
+        title "%m:%20<..<%~"
+    else
+        title "%20<..<%~"
+    fi
+}
+
+function preexec_title {
+    title "%20<..<${${${1//\%/%%}//\\?/}/[[:cntrl:]]*/}"
+}
+
+preexec_functions+=(preexec_title)
+precmd_functions+=(precmd_title)
+
+fi
+

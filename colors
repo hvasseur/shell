@@ -1,0 +1,128 @@
+#################################-*-sh-*-#
+# Functions to work with terminal colors #
+##########################################
+# Color scaling:
+# Red:   for i in {0..5}; echo -n "\e[38;5;$((16 + 6 * 6 * i))m#";
+# Green: for i in {0..5}; echo -n "\e[38;5;$((16 + 6 * i))m#";
+# Blue:  for i in {0..5}; echo -n "\e[38;5;$((16 + i))m#";
+# 
+# Get random color:
+# R=0; G=0; B=0; echo -n "\e[38;5;$((16 + 6 * 6 * $R + 6 * $G + $B))m#";
+
+# Convert 256 to RGB (only work for 216 colors)
+function 256toRGB {
+  COL=(0 95 135 175 215 255)
+  C=$1
+  ((C-=16))
+  B=$COL[$((C % 6 + 1))]
+  ((C/=6))
+  G=$COL[$((C % 6 + 1))]
+  ((C/=6))
+  R=$COL[$((C + 1))]
+  echo $R $G $B
+}
+
+function XtoRGB {
+  ARG=$1
+  printf '%d %d %d\n' 0x$ARG[1]$ARG[2] 0x$ARG[3]$ARG[4] 0x$ARG[5]$ARG[6]
+}
+
+# Convert 256 to RGB (only work for 216 colors)
+function RGBto256 {
+  COL=(47 115 155 195 235 255)
+  C=0
+  for p in $1 $2 $3; do
+    ((C *= 6))
+    for i in {1..6}; do
+      if (($p <= $COL[$i])); then
+        ((C += i - 1))
+        break
+      fi
+    done
+  done
+  ((C += 16))
+  echo $C
+}
+
+# Convert 16 to RGB
+function 16toRGB {
+  #IDX=(0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15)
+  R=(   0 178  24 178  24 178  24 178 104 255  84 255  84 255  84 255)
+  G=(   0  24 178 104  24  24 178 178 104  84 255 255  84  84 255 255)
+  B=(   0  24  24  24 178 178 178 178 104  84  84  84 255 255 255 255)
+  echo $R[$1 + 1] $G[$1 + 1] $B[$1 + 1]
+}
+
+# Convert RGB to 16
+function RGBto16 {
+  ARGR=$1
+  ARGG=$2
+  ARGB=$3
+  MIN=4000000
+  K=0
+  for i in {0..15}; do
+    # See http://www.compuphase.com/cmetric.htm
+    RGB=( $(16toRGB $i) )
+    RMEAN=$((($RGB[1] + ARGR) / 2.))
+    DR=$(($RGB[1] - ARGR))
+    DG=$(($RGB[2] - ARGG))
+    DB=$(($RGB[3] - ARGB))
+    L=$(((((512. + RMEAN) * DR ** 2.) / 256.) + 4. * DG ** 2 + (((767. - RMEAN) * DB ** 2.) / 256.)))
+    if (($L < $MIN)); then
+      MIN=$L
+      K=$i
+    fi
+  done
+  K=$((K > 7 ? K + 90 - 8 : K + 30))
+  echo $K
+}
+
+# Convert 256 colors to 16 colors
+function 256to16 {
+  RGB=( $(256toRGB $1) )
+  RGBto16 $RGB[@]
+}
+
+# Check your terminal:
+# Print the 16 ansi colors (5 entries should be gray)
+function pr_16colors {
+  for i in 0 1; do 
+    for j in {30..39} {90..99}; 
+      printf "\e[${i};${j}m%02d " "$j" 
+    echo
+  done
+}
+
+# Print the 16 ansi colors using 256 color escaping 
+function pr_256colors_16 {
+  for i in {0..15}; 
+    printf "\e[38;5;${i}m%02d " "$i" 
+  echo
+}
+# Print grayscale colors using 256 color escaping 
+function pr_256colors_gray {
+  for i in {232..255}; 
+    printf "\e[38;5;${i}m%03d " "$i"
+  echo
+}
+# Print 216 last colors using 256 color escaping 
+function pr_256colors_color {
+  for i in {16..231}; do 
+    printf "\e[38;5;${i}m%03d " "$i"
+    [[ $(((i - 15) % 36)) -eq 0 ]] && echo
+  done
+}
+function pr_256colors {
+  pr_256colors_16 
+  pr_256colors_gray
+  pr_256colors_color
+}
+
+function pr_256to16 {
+  for i in {16..231}; do
+#    echo -n "\e[38;5;${i}m#"
+    printf "\e[$(256to16 $i)m%03d " "$i" 
+    ((((i - 15) % 36) == 0)) && echo 
+  done
+}
+

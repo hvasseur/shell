@@ -1,0 +1,62 @@
+#!/bin/bash
+# kate: hl zsh; space-indent on; indent-width 4;
+
+function shell_is {
+    [[ "$1" = "zsh" && -n "$ZSH_VERSION" ]] && return 0
+    [[ "$1" = "bash" && -n "$BASH_VERSION" ]] && return 0
+    return 1
+}
+
+local ARG EXT ARCHIVE
+for ARG in "$@"; do
+    # bug: \. should be written \\. under zsh, but not under bash
+    if [[ "$ARG" =~ \.(tar\|cpio\.)?[[:alnum:]]{1,4}$ ]]; then
+        shell_is zsh  && EXT="${MATCH#.}"
+        shell_is bash && EXT="${BASH_REMATCH[0]#.}"
+        ARCHIVE="$ARG"
+    else
+        echo "Cannot process $ARG"
+        continue
+    fi
+    case "${(L)EXT}" in
+        tar|tar.z|tar.gz|tgz|tar.bz2|tbz2|tbz|tar.xz|txz|tar.lzma|tlz)
+            tar tvf    "$ARCHIVE" ;;
+        tar.lzo|tzo)
+            tar tv --use-compress-program=lzop -f "$ARCHIVE";;
+        a)
+            ar tv      "$ARCHIVE" ;;
+        deb|ipk)
+            dpkg -c    "$ARCHIVE" ;;
+        rpm)
+            rpm2cpio   "$ARCHIVE" | cpio -t ;;
+        cpio)
+            cat        "$ARCHIVE" | cpio -t ;;
+        cpio.gz)
+            zcat       "$ARCHIVE" | cpio -t ;;
+        cpio.bz2)
+            bzcat      "$ARCHIVE" | cpio -t ;;
+        cpio.xz|cpio.lzma)
+            xzcat      "$ARCHIVE" | cpio -t ;;
+        cpio.lzo)
+            lzcat      "$ARCHIVE" | cpio -t ;;
+        zip|jar|war)
+            unzip   -l "$ARCHIVE" ;;
+        rar)
+            rar vb     "$ARCHIVE" ;;
+        7z)
+            7z l       "$ARCHIVE" ;;
+        z|gz)
+            gunzip  -l "$ARCHIVE" ;;
+        bz2)
+            bunzip2 -l "$ARCHIVE" ;;
+        xz)
+            unxz    -l "$ARCHIVE" ;;
+        lzma)
+            unlzma  -l "$ARCHIVE" ;;
+        lzo)
+            unlzop  -l "$ARCHIVE" ;;
+        *) 
+            echo "Cannot process $ARG ($EXT)" ;;
+    esac
+done
+

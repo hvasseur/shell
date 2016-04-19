@@ -1,0 +1,70 @@
+#!/bin/bash
+# kate: hl zsh; space-indent on; indent-width 4;
+
+function shell_is {
+    [[ "$1" = "zsh" && -n "$ZSH_VERSION" ]] && return 0
+    [[ "$1" = "bash" && -n "$BASH_VERSION" ]] && return 0
+    return 1
+}
+
+local ARG EXT INPUT ARCHIVE
+for ARG in "$@"; do
+    # bug: \. should be written \\. under zsh, but not under bash
+    if [[ "$ARG" =~ \.(tar\|cpio\.)?[[:alnum:]]{1,4}$ ]]; then
+        shell_is zsh  && EXT="${MATCH#.}"
+        shell_is bash && EXT="${BASH_REMATCH[0]#.}"
+        INPUT="${ARG%.$EXT}"
+        ARCHIVE="$ARG"
+    else
+        EXT="tgz"
+        INPUT="$ARG"
+        ARCHIVE="$ARG.$EXT"
+    fi
+    case "${(L)EXT}" in
+        tar)
+            tar cvf  "$ARCHIVE" "$INPUT" ;;
+        tar.z)
+            tar cvZf "$ARCHIVE" "$INPUT" ;;
+        tar.gz|tgz)
+            tar cvzf "$ARCHIVE" "$INPUT" ;;
+        tar.bz2|tbz2|tbz)
+            tar cvjf "$ARCHIVE" "$INPUT" ;;
+        tar.xz|txz)
+            tar cvJf "$ARCHIVE" "$INPUT" ;;
+        tar.lzma|tlz)
+            tar cv --lzma -f "$ARCHIVE" "$INPUT" ;;
+        tar.lzo|tzo)
+            tar cv --use-compress-program=lzop -f "$ARCHIVE" "$INPUT" ;;
+        cpio)
+            find "$INPUT" -print0 | cpio -ov0 > "$ARCHIVE" ;;
+        cpio.gz)
+            find "$INPUT" -print0 | cpio -ov0 | gzip  > "$ARCHIVE" ;;
+        cpio.bz2)
+            find "$INPUT" -print0 | cpio -ov0 | bzip2 > "$ARCHIVE" ;;
+        cpio.xz|cpio.lzma)
+            find "$INPUT" -print0 | cpio -ov0 | xz    > "$ARCHIVE" ;;
+        cpio.lzo)
+            find "$INPUT" -print0 | cpio -ov0 | lzop  > "$ARCHIVE" ;;
+        zip|jar|war)
+            zip -r   "$ARCHIVE" "$INPUT" ;;
+        rar)
+            rar a    "$ARCHIVE" "$INPUT" ;;
+        7z)
+            7z  a    "$ARCHIVE" "$INPUT" ;;
+        z)
+            compress -v         "$INPUT" ;;
+        gz)
+            gzip  -v            "$INPUT" ;;
+        bz2)
+            bzip2 -v            "$INPUT" ;;
+        xz)
+            xz    -v            "$INPUT" ;;
+        lzo)
+            lzop  -v            "$INPUT" ;;
+        lzma)
+            lzma  -v            "$INPUT" ;;
+        *)
+            echo "Cannot process $ARG ($INPUT $EXT)" >&2 ;;
+    esac
+done
+

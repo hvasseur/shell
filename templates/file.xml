@@ -1,0 +1,14 @@
+<!-- vim: set sw=2 expandtab: -->
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Created: $(date --rfc-3339=s)
+  Main authors:
+      - $NAME <$EMAIL>
+-->
+<!DOCTYPE $(basename $FILE .xml) [
+<!ELEMENT $(basename $FILE .xml) ANY>
+]>
+
+<$(basename $FILE .xml)>
+  $CURSOR
+</$(basename $FILE .xml)>

@@ -1,0 +1,12 @@
+config BR2_PACKAGE_${DIR_UP}
+	bool "${DIR}"
+	depends on BR2_PACKAGE_XXX
+	select BR2_PACKAGE_XXX
+	help
+	  Description here$CURSOR
+
+	  http://www.url.dom/
+
+comment "${DIR} need XXX"
+	depends on !BR2_PACKAGE_XXX
+

@@ -1,0 +1,122 @@
+##################-*-sh-*-#
+# LS_COLORS configuration #
+###########################
+
+export LS_COLORS=""
+
+add() {
+  C="$2"
+  if [[ $# -gt 2 && "$TERM" != xterm-256color ]]; then
+    C="$3"
+  fi
+  if [[ $C = 9* && ( "$TERM" = linux || "$TERM" = dumb || "$TERM" = ansi ) ]]; then
+    C="1;3${C#9}"
+  fi
+  LS_COLORS="$LS_COLORS$1=$C:"
+}
+
+add no 0      # Normal (non-filename) text
+add fi 0      # Regular file
+#add hl 37\;44 # Regular file with more than one link (hardlink)
+add ln 96     # Symbolic link
+add or 91\;40 # Orphaned symbolic link (defaults to ln)
+# add mi      # Missing file (visible when you type ls -l) (defaults to fi) 
+add pi 33     # Named pipe (FIFO)
+add so 95     # Socket
+add do 95     # Door ??
+add bd 93     # Block device
+add cd 93     # Character device
+add di 94     # Directory (-t,o-w)
+add tw 30\;42 # Directory that is sticky and other-writable (+t,o+w)
+add ow 34\;42 # Directory that is other-writable and not sticky (-t,o+w)
+add st 37\;44 # Directory with the sticky bit set and not other-writable (+t,o-w)
+add ex 92     # Executable file
+add su 37\;41 # File that is setuid (u+s)
+add sg 30\;43 # File that is setgid (g+s)
+#add ca 30\;41 # File with capability ??
+# lc   ^[[    # Left code
+# rc   m      # Right code
+# ec          # End code (replaces lc+no+rc)
+# rs   0      # Reset code
+
+# Archives
+for i in zip rar ace tar z Z gz bz2 xz taz tgz tbz txz; do
+  add "*.$i" 31
+done
+# Packages
+for i in deb rpm jar; do
+  add "*.$i" 91
+done
+
+## Medias 
+# Pictures
+for i in jpg JPG jpeg gif bmp pbm pgm ppm png tga xbm xpm tif tiff xcf xwd; do
+  add "*.$i" 35
+done
+# Video
+for i in avi mpg mpeg mov fli mkv mp4; do
+  add "*.$i" 95
+done
+# Sound
+for i in ogg mp3 wav; do
+  add "*.$i" 95
+done
+
+## Documents
+# Textual documents
+for i in dvi ps pdf html htm rtf txt log tex; do
+  add "*.$i" 36
+done
+add \*README 36
+add \*TODO 36
+# Office Documents (50, 44, 38, 32)
+#for i in odt doc docx odp ppt pptx ods xls xlsx; do
+#  add "*.$i" 36
+#done
+
+for i in odt doc docx; do
+  add "*.$i" "38;5;50" 36
+done
+for i in odp ppt pptx; do
+  add "*.$i" "38;5;44" 36
+done
+for i in ods xls xlsx; do
+  add "*.$i" "38;5;38" 36
+done
+
+
+## Developement
+# Sources
+#for i in cpp cxx cc c C h hxx sh awk pl rb py; do
+#  add "*.$i" 33
+#done
+for i in cpp cxx cc c C; do
+  add "*.$i" "38;5;202" 33
+done
+for i in h hxx; do
+  add "*.$i" "38;5;208" 33
+done 
+for i in sh awk pl rb py; do
+  add "*.$i" "38;5;214" 33
+done
+
+add \*.in "38;5;228" 93
+add \*.am "38;5;228" 93
+add \*.ac "38;5;228" 93
+add \*.mk "38;5;227" 93
+add \*Makefile "38;5;226" 93
+add \*Kconfig  "38;5;227" 93
+add \*Kbuild   "38;5;227" 93
+# TODO: *.patch *.diff
+
+# Objects
+for i in so o a pyc; do
+  add "*.$i" 32
+done
+
+# Dirty
+add \*~ 90
+add \*# 90
+#add \*.orig 90
+
+

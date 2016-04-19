@@ -1,0 +1,25 @@
+#######-*-sh-*-#
+# Bash options #
+################
+
+bind -m emacs
+bind "set history-size 1000"
+bind "set show-all-if-ambiguous"
+bind "set show-all-if-unmodified"
+bind "set skip-completed-text"
+bind "set visible-stats"
+#bind "TAB: menu-complete"
+set -b
+
+shopt -s cdspell
+shopt -s autocd
+shopt -s cmdhist
+shopt -s extglob
+shopt -s histappend
+shopt -s histreedit
+shopt -s histverify
+shopt -s interactive_comments
+shopt -s lithist
+shopt -u mailwarn
+shopt -s checkwinsize
+
