@@ -1,0 +1,55 @@
+# kate: hl zsh; space-indent on; indent-width 4;
+##-*-sh-*-#
+# Helpers #
+###########
+
+# You will find a collection of shell commands I find it is not usefull to 
+# make an alias, but usefull to remember:
+
+# Retrieve a directory shared with apache
+# wget -r --convert-links --no-parent --reject "index.html*" http://mysite.com/dir
+
+# Retreive a page with all dependencies:
+# wget -H -p --convert-links -e robots=off http://mysite.com/page.html
+
+# Get a bundle of page reference by one page:
+# wget https://github.com/mbats/eclipse-buildroot-bundle/wiki/Release-Notes -O - | grep 'wiki/[^_]' | wget -H -p --force-html --convert-links -B https://github.com/ -i -
+
+# Retrieve a wiki
+# wget -r -H -p --convert-links --no-parent --reject "_history" -k --reject "_edit" -e robots=off http://mysite.com/wiki/entrypage
+
+# To get lines 10 to 20 of FILE:
+# sed -ne ’10,20p’ FILE
+# 
+# 5 lines from 10th line:
+# sed -ne ’10,+5p’ FILE
+# 
+# Every lines but not 10 first lines:
+# sed -ne ’10,$p’ FILE
+# tail -n +11 FILE
+#
+# It is difficult to simulate tail behavior and things like all line but the 
+# 10 last. Better use negative number with head:
+# head -n -10 FILE
+#
+# See http://sed.sourceforge.net/grabbag/tutorials/do_it_with_sed.txt
+
+# Get my mapping:
+# setxkbmap -model pc101 -layout us -variant mac -option compose:caps
+# Make greek symbols using AltGr+g:
+# xmodmap -e 'keycode  42 = g G g G dead_greek dead_greek dead_greek dead_greek'
+# "Fast" keyboard:
+# xset r rate 200 40
+# (place these in .xinitrc to make them permanent)
+
+# Colorize output of find:
+# find . -print0 | xargs -0 ls --color -d
+
+# Sort lines of selected text
+# xselpaste | sort | xselcopy
+# or without alises
+# xsel --output | sort | xsel --input
+
+
+
+

@@ -1,0 +1,49 @@
+# this file is only for epita
+set WHERE labacu # epita/cygnus/antares/sagitta/labacu
+set ROOT no     # yes/no
+
+#
+# aliases
+#
+alias a alias
+a cd.. "cd .."
+a cd... "cd ../.."
+a cd/ "cd /"
+a cd~ "cd ~"
+
+# Alias de ls
+a ls "ls -p -F --color=auto"
+a l "ls -l"
+a lm 'ls -la | more'
+a la ls -aF
+a ll ls -alF
+
+# Autres alias
+a px "ps aux"
+a psax "ps aux"
+a h history
+a em "emacs -nw"
+a tarc "tar -zcvf"
+a tarx "tar -zxvf"
+a upchlog "emacs -f vc-update-change-log"
+
+##
+# Options
+#
+limit core 0
+set	prompt="%B%{^[[33m%}%n%{^[[0m%}%b@%B%{^[[35m%}%M%{^[[0m%}%u%b:%B%{^[[32m%}%~%b%{^[[31m%}%#%{^[[0m%} "
+set	ignoreeof
+set	history=1000
+set	savehist=400
+set	watch=(1 $USER any)
+set	cdpath=(~)
+unset	autologout
+set     autolist
+
+##
+# bindings
+#
+bindkey ^R i-search-back
+
+#setenv	XTERM_OPTS "-T ${HOST}@${USER} -n ${HOST}@${USER} -ls"
+

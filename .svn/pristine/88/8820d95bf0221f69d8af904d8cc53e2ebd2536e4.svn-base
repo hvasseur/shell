@@ -1,0 +1,83 @@
+######-*-sh-*-#
+# Zsh modules #
+###############
+# Usefull builtins (automatly loaded)
+zmodload -i zsh/zutil
+# Zsh Line Editor (automatly loaded)
+zmodload -i zsh/zle
+# Color/Menu completion (automatly loaded)
+zmodload zsh/complist
+# Portable simple commands (/!\ scripting)
+#zmodload zsh/files
+# Built in stat
+zmodload zsh/stat
+# Advanced maths (sin, log etc...)
+zmodload zsh/mathfunc
+# Command to open port (like netcat)
+zmodload zsh/net/tcp
+# FTP module
+zmodload zsh/zftp
+# Near same than "screen" command
+zmodload zsh/zpty
+# Near same command as "at"
+zmodload zsh/sched
+# Interface for "select" system call
+zmodload zsh/zselect
+# Widget delete-to-char
+zmodload zsh/deltochar
+
+############################
+# Zsh autoloaded functions #
+############################
+# Make comfiguration files faster
+typeset -fu zrecompile
+# Great calc
+typeset -fu zcalc
+# Little usefull editor
+typeset -fu zed
+# Basics commands zsh powered! (don't forget -n option)
+#typeset -fu zmv zcp zln
+# Zftp functions
+typeset -fu zfinit
+zfinit
+# Tcp functions
+typeset -fu tcp_open tcp_point tcp_shoot
+# Helper for keyboard configuration
+typeset -fu zkbd
+# Use it when commend say "Too many arguments"
+typeset -fu zargs
+# Better nslookup
+typeset -fu nslookup
+# Pretty prompts
+#typeset -fu promptinit
+#promptinit
+# Tetris
+#typeset -fu tetris
+# Improved run-help function which search help than man page
+typeset -fu run-help
+# Contextual help for git, svn and svk
+typeset -fu run-help-git 
+typeset -fu run-help-svn
+#typeset -fu run-help-svk
+# By default, run-help is just an alias to man
+alias run-help > /dev/null && unalias run-help
+
+function run-help-sudo() {
+    if (($# == 0)); then
+        man sudo
+    else
+        man $1
+    fi
+}
+
+function run-help-openssl() {
+    if (($# == 0)); then
+        man openssl
+    else
+        man $1
+    fi
+}
+
+#typeset -fu run-help-sudo
+#typeset -fu run-help-openssl
+

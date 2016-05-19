@@ -1,0 +1,98 @@
+##################-*-sh-*-#
+# Environnement variables #
+###########################
+
+function shell_is {
+    [[ "$1" = "zsh" && -n "$ZSH_VERSION" ]] && return 0
+    [[ "$1" = "bash" && -n "$BASH_VERSION" ]] && return 0
+    return 1
+}
+
+# Some system does not include sbin in $PATH. Fix that
+[[ $PATH == */sbin* ]] || PATH=/usr/local/sbin:/usr/sbin:/sbin:$PATH
+
+# Globals
+if which git > /dev/null; then
+  export NAME="$(git config --global --get user.name)"
+  export EMAIL="$(git config --global --get user.email)"
+fi
+
+# Fix bad TERM handling
+if shell_is zsh && [[ ! -e /usr/share/terminfo/$TERM[1]/$TERM && ! -e /lib/terminfo/$TERM[1]/$TERM ]]; then
+    echo "TERM=$TERM not found. Using TERM=xterm."
+    TERM=xterm
+fi
+
+# For emacs "shell" function
+export ESHELL=$SHELL
+
+export LANG=C
+# Other usefull values: fr_FR.utf8 fr_FR.iso88591 fr_FR.iso885915@euro
+for i in en_GB.utf8 en_GB.iso885915@euro en_GB.iso88591 en_US.utf8 en_US.iso885915@euro en_US.iso88591; do
+  locale -a | grep -q $i && LANG=$i && break;
+done
+
+# Export if needed
+#export http_proxy=http://jerome.pouiller:XXXXXX@wcg-node2.corp.crf.canon.fr:8080
+#export ftp_proxy=http://jerome.pouiller:XXXXX@wcg-node2.corp.crf.canon.fr:8080
+#export https_proxy=http://jerome.pouiller:XXXXX@wcg-node2.corp.crf.canon.fr:8080
+
+# Choose right Editor
+# EDITOR_FALLBACK and EDITOR_LOCAL are used for redit.sh
+if [[ -x ~/conf/bin/redit.sh ]]; then
+  export EDITOR_FALLBACK=vim
+  export EDITOR=$HOME/conf/bin/redit.sh
+elif which kate > /dev/null && [[ -z "$SSH_TTY" ]]; then
+  export EDITOR="kate -b"
+else 
+  export EDITOR=vim
+fi 
+if which kate > /dev/null && [[ -z "$SSH_TTY" ]]; then
+  export EDITOR_LOCAL="kate -b"
+else 
+  export EDITOR_LOCAL=vim
+fi 
+
+if [[ -x ~/conf/bin/svn-editor.sh ]]; then
+  export SVN_EDITOR=~/conf/bin/svn-editor.sh
+fi
+
+#export GREP_OPTIONS="--exclude=*~ --exclude-dir=.git --exclude-dir=.svn"
+#if [[ "$TERM" != dumb ]]; then
+#  GREP_OPTIONS+=" --color=auto"
+#fi
+
+export PAGER=less
+# Do not use vim as pager because it does not "quit if one screen" and there 
+#  is no way to disable "clear terminal on exit"
+#[[ -x /usr/share/vim/vimcurrent/macros/less.sh ]] &&
+#  export PAGER="/usr/share/vim/vimcurrent/macros/less.sh"
+export LESS="--quit-if-one-screen --LONG-PROMPT --window=-4 --no-init --HILITE-UNREAD -R"
+which lesspipe.sh &> /dev/null && 
+  eval "$(lesspipe.sh)"
+which lesspipe &> /dev/null && 
+  eval "$(lesspipe)"
+
+export LESS_TERMCAP_so=$'\e[1;33;40m'     # begin standout-mode - info box
+export LESS_TERMCAP_se=$'\e[0m'           # end standout-mode
+if [[ "$TERM" = "xterm-256color" ]]; then
+  export LESS_TERMCAP_md=$'\e[1;38;5;229m'   # begin bold
+  export LESS_TERMCAP_me=$'\e[0m'            # end mode
+  export LESS_TERMCAP_us=$'\e[4;38;5;223m'  # begin underline
+  export LESS_TERMCAP_ue=$'\e[0m'           # end underline
+else
+  unset LESS_TERMCAP_md
+  unset LESS_TERMCAP_me
+  unset LESS_TERMCAP_us
+  unset LESS_TERMCAP_ue 
+fi
+
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+export GDBHISTFILE=~/.gdb_history
+
+# See http://tex.stackexchange.com/questions/52988/avoid-linebreaks-in-latex-console-log-output
+export max_print_line=1000
+export error_line=254
+export half_error_line=238
+

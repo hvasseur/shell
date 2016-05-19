@@ -1,0 +1,14 @@
+/* vim: set sw=4 expandtab: */
+/*
+ * Licence: GPL
+ * Created: $(date --rfc-3339=s)
+ * Main authors:
+ *     - $NAME <$EMAIL>
+ */
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+    $CURSOR
+
+    return 0;
+}

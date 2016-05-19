@@ -1,0 +1,28 @@
+#
+# Licence: GPL
+# Created: $(date --rfc-3339=s)
+# Main authors:
+#     - $NAME <$EMAIL>
+#
+CC = gcc
+CFLAGS= -Wall
+PREFIX = /usr/local
+
+all: ${DIR}
+
+${DIR}: ${DIR}.o
+-include ${DIR}.d
+$CURSOR
+
+%.o: %.c
+	\$(COMPILE.c) -MMD -c -o \$@ \$<
+
+clean:
+	rm -f *.o *.d
+
+distclean: clean
+	rm ${DIR}
+
+install:
+	install -s -D -m 755 ${DIR} \$(PREFIX)/bin
+

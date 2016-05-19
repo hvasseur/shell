@@ -1,0 +1,115 @@
+###############-*-sh-*-#
+# Prompt configuration #
+########################
+
+function shell_is {
+    [[ "$1" = "zsh" && -n "$ZSH_VERSION" ]] && return 0
+    [[ "$1" = "bash" && -n "$BASH_VERSION" ]] && return 0
+    return 1
+}
+
+if shell_is zsh; then
+  PRE='%{['
+  SUF='m%}'
+else
+  PRE='\[['
+  SUF='m\]'
+fi
+
+# Color
+function C {
+    case $TERM in
+	ansi|dumb|emacs*)
+	    ;;
+	*)
+	    echo -n "${PRE}$1${SUF}"
+	    ;;
+    esac
+}
+
+# Extended color (256-xterm)
+function EC {
+  C "38;5;$1"; 
+}
+
+function rand_col {
+  declare -a RCOLS;
+  RCOLS=()
+  case "$TERM" in
+      ansi|dumb|emacs*)
+	  RCOLS=(0)
+	  ;;
+      linux|ansi|eterm*)
+	  RCOLS=(31 32 33 35 36 1\;31 1\;32 1\;33 1\;34 1\;35 1\;36)
+	  ;;
+      xterm)
+	  RCOLS=(31 32 33 35 36 91 92 93 94 95 96)
+	  ;;
+      *)
+	  for i in {17..232}; do RCOLS+=(38\;5\;$i); done
+	  ;;
+  esac
+  echo "${RCOLS[$((0x$(echo $1 | md5sum | cut -c 1-4) % ${#RCOLS[@]} + 1))]}"
+}
+
+# Change color beetween host 
+HOST_COL=$(rand_col $(hostname))
+#case "$WHERE" in
+#  cygnus|aries|draco)
+#    HOST_COL="35" ;;
+#  antares)
+#    HOST_COL="36" ;;
+#  sagitta)
+#    HOST_COL="34;1" ;;
+#  epita)
+#    HOST_COL="33" ;;
+#  labacu|prologia|ee)
+#    HOST_COL="37" ;;
+#  *)
+#    HOST_COL="32" ;;
+#esac
+HOST_COL="$(C ${HOST_COL})"
+
+# Change color beetween users
+USER_COL=$(rand_col $(whoami))
+#case "$WHO" in
+#  root)
+#    ROOT_COL="$(C 1)"
+#    USER_COL="31;1"
+#  ;;
+#  jezz)
+#    USER_COL="36" ;;
+#  pouill_j)
+#    USER_COL="35" ;;
+#  calvair|acu2005|acu)
+#    USER_COL="32" ;;
+#  *)
+#    USER_COL="34" ;;
+#esac
+USER_COL="$(C ${USER_COL})"
+
+if shell_is zsh; then
+  # Right screen side prompt
+  RPROMPT="%b$USER_COL%n$(C 0)%b@$HOST_COL%M$(C 0)%u%b - %(?,%T,$(C 31)Return %?$(C 0))$ROOT_COL"
+  # Correction prompt
+  SPROMPT="%BError!%b Correct $(C 31)%R$(C 0) to $(C 36)%r$(C 0)? [No/Yes/Abort/Edit]: "
+  # Normal prompt
+  PS1="$(C 37)%~$(C 31)%(!.#.$)$(C 0)$ROOT_COL "
+  PS2="$(C 35)%_>$(C 0) "
+  PS3="$(C 33)?#$(C 0) "
+  PS4="$(C 32)+$(C 0) "
+else
+  PS1="${USER_COL}\u$(C 0)@${HOST_COL}\h$(C 0):$(C 37)\w$(C 31)"
+  if [[ $(id -u) -eq 0 ]]; then 
+    PS1+="#"
+  else
+    PS1+="\$"
+  fi
+  PS1+="$(C 0)$ROOT_COL "
+  PS2="$(C 35)\s>$(C 0) "
+  PS3="$(C 33)?#$(C 0) "
+  PS4="$(C 32)+$(C 0) "
+fi
+
+unset C EC USER_COL HOST_COL ROOT_COL
+

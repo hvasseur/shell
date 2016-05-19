@@ -1,0 +1,37 @@
+###################-*-sh-*-#
+# First: identify who am i #
+############################
+
+case $TERM in
+    dumb|emacs*)
+	C=
+	E=
+        ;;
+    *)
+	C="\e[33;1m"
+	E="\e[0m"
+        ;;
+esac
+
+echo -e "Welcome $C$(id -nu) (${NAME:-unset name} <${EMAIL:-unset email}>)$E on $C$(hostname)$E."
+echo -e "Your current charset is $C${LANG}$E on terminal $C${TERM}$E."
+if [[ -z "$DISPLAY" ]]; then
+    echo -e "No X server configured"
+else
+    echo -e "Your X server: $C${DISPLAY}$E"
+fi
+
+if [[ -z "$SSH_AUTH_SOCK" ]]; then
+    echo "No ssh-agent"
+else
+    ssh-add -l
+fi
+
+if [[ -z ${NAME} || -z ${EMAIL} ]]; then
+  echo 'You may set your name and your email using:'
+  echo '  git config --global --add user.email "your@email.com"'
+  echo '  git config --global --add user.name "Your Name"'
+fi
+
+#umask 002
+

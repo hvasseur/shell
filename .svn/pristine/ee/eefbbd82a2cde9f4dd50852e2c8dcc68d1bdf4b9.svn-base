@@ -1,0 +1,13 @@
+/* vim: set sw=4 expandtab: */
+/*
+ * Licence: GPL
+ * Created: $(date --rfc-3339=s)
+ * Main authors:
+ *     - $NAME <$EMAIL>
+ */
+#ifndef $FILE_UP
+# define $FILE_UP
+
+$CURSOR
+
+#endif /* $FILE_UP */

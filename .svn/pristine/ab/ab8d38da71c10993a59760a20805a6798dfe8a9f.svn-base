@@ -1,0 +1,189 @@
+##-*-sh-*-#
+# Options #
+###########
+
+emulate zsh
+
+# Changing Directories
+setopt AUTO_CD              # /home -> cd /home
+setopt AUTO_PUSHD           # popd to go in an old directory 
+setopt CDABLE_VARS          # cd mbin -> cd ~/mbin
+#setopt CHASE_DOTS
+#setopt CHASE_LINKS 
+setopt PUSHD_IGNORE_DUPS    # Pas de duplication dans pushd
+setopt PUSHD_MINUS          # La completion sur cd - commence par le plus récent 
+#setopt PUSHD_SILENT 
+#setopt PUSHD_TO_HOME 
+
+## Completion
+#setopt ALWAYS_LAST_PROMPT  #<D>
+#setopt ALWAYS_TO_END
+#setopt AUTO_LIST           #<D>
+#setopt AUTO_MENU           #<D>
+#setopt AUTO_NAME_DIRS
+#setopt AUTO_PARAM_KEYS     #<D>
+#setopt AUTO_PARAM_SLASH    #<D>
+#setopt AUTO_REMOVE_SLASH   #<D>
+#setopt BASH_AUTO_LIST
+#setopt COMPLETE_ALIASES
+setopt COMPLETE_IN_WORD     # Complete au milieu des mots
+setopt GLOB_COMPLETE        # *<TAB> liste au lieu de d'étendre
+#setopt HASH_LIST_ALL       #<D>
+#setopt LIST_AMBIGUOUS      #<D>
+#setopt LIST_BEEP           #<D>
+setopt LIST_PACKED          # Permet d'utiliser des colonne de taille differente dans la présentation des coix
+#setopt LIST_ROWS_FIRST
+#setopt LIST_TYPES          #<D>
+#setopt MENU_COMPLETE 
+#setopt REC_EXACT 
+
+## Expansion and Globbing
+#setopt BAD_PATTERN         #<C> <Z>
+#setopt BARE_GLOB_QUAL      #<Z>
+#setopt BRACE_CCL
+#setopt CASE_GLOB           #<D>
+#setopt CASE_MATCH          #<D>
+#setopt CSH_NULL_GLOB       #<C>
+#setopt EQUALS              #<Z>
+setopt EXTENDED_GLOB        # allow use '#', '~' and '^' in globbing
+#setopt GLOB                #<D>
+#setopt GLOB_ASSIGN         #<C>
+#setopt GLOB_DOTS 
+#setopt GLOB_SUBST          #<C> <K> <S> Faut-il imiter le comportement de bash?
+#setopt HIST_SUBST_PATTERN
+#setopt IGNORE_BRACES       #<S>
+#setopt KSH_GLOB            #<K>
+setopt MAGIC_EQUAL_SUBST
+#setopt MARK_DIRS 
+#setopt MULTIBYTE           #<C> <K> <Z>
+unsetopt NOMATCH            #<C> <Z> # bash pattern style
+#setopt NULL_GLOB 
+setopt NUMERIC_GLOB_SORT    # Numeric sort in globing (usefull for image view)
+#setopt RC_EXPAND_PARAM 
+#setopt REMATCH_PCRE        #<Z>
+#setopt SH_GLOB             #<K> <S>
+#setopt UNSET               #<K> <S> <Z> Les variables inexistantes sont considérées comme vides
+#setopt WARN_CREATE_GLOBAL
+
+## History
+#setopt APPEND_HISTORY        #<D>
+unsetopt BANG_HIST             #<C> <Z> # Ne pas étendre les !
+setopt EXTENDED_HISTORY       #<C> # Ajoute des information à l'historique
+#setopt HIST_ALLOW_CLOBBER
+#setopt HIST_BEEP             #<D>
+setopt HIST_EXPIRE_DUPS_FIRST # Si on doit supprimer des entrées de l'historique, on supprime les duppliquée d'abord
+setopt HIST_FCNTL_LOCK        # Meilleur performence pour le mécanisme d'exclusion mutuelle sur le fichier history
+setopt HIST_FIND_NO_DUPS      # Ne pas affichier les éléments dupliqués
+#setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_DUPS       # Jamais 2 fois de suite la meme commande 
+#setopt HIST_IGNORE_SPACE 
+#setopt HIST_NO_FUNCTIONS
+#setopt HIST_NO_STORE
+#setopt HIST_REDUCE_BLANKS     # Supprime les espaces en trop dans l'historique
+#setopt HIST_SAVE_BY_COPY     #<D>
+#setopt HIST_SAVE_NO_DUPS
+#setopt HIST_VERIFY
+setopt INC_APPEND_HISTORY     # Append to history in real-time
+#setopt SHARE_HISTORY         #<K>
+
+## Initialisation
+#setopt ALL_EXPORT 
+#setopt GLOBAL_EXPORT       #<Z>
+#setopt GLOBAL_RCS          #<D>
+#setopt RCS                 #<D>
+
+## Input/Output
+#setopt ALIASES             #<D>
+#setopt CLOBBER             #<D>
+#setopt CORRECT 
+#setopt CORRECT_ALL 
+#setopt DVORAK
+unsetopt FLOW_CONTROL         #<D> Disable ^s and ^q (for emacs users)
+#setopt IGNORE_EOF 
+setopt INTERACTIVE_COMMENTS  #<K> <S> To allow comments in interactive shell
+#setopt HASH_CMDS            #<D>
+#setopt HASH_DIRS            #<D>
+#setopt MAIL_WARNING 
+#setopt PATH_DIRS 
+#setopt PRINT_EIGHT_BIT
+#setopt PRINT_EXIT_VALUE 
+#setopt RC_QUOTES
+#setopt RM_STAR_SILENT       #<K> <S>
+#setopt RM_STAR_WAIT
+#setopt SHORT_LOOPS          #<C> <Z>
+#setopt SUN_KEYBOARD_HACK 
+
+## Job Control
+#setopt AUTO_CONTINUE
+#setopt AUTO_RESUME 
+#setopt BG_NICE              #<C> <Z>
+#setopt CHECK_JOBS           #<Z>
+#setopt HUP                  #<Z>
+setopt LONG_LIST_JOBS        # Commande jobs plus verbeuse
+#setopt MONITOR 
+#setopt NOTIFY               #<Z>
+
+## Prompting
+#setopt PROMPT_BANG          #<K>
+unsetopt PROMPT_CR            #<D> To see the output of "echo -n foo" correctly
+#setopt PROMPT_SP            #<D>
+#setopt PROMPT_PERCENT       #<C> <Z>
+#setopt PROMPT_SUBST         #<K> <S>
+setopt TRANSIENT_RPROMPT    # Allow to copy-paste our terminal event with RPROMPT enable
+
+## Scripts and Functions
+setopt C_BASES               # Use prefix 0x for hexadecimal display
+#setopt C_PRECEDENCES
+#setopt DEBUG_BEFORE_CMD
+#setopt ERR_EXIT 
+#setopt ERR_RETURN
+#setopt EVAL_LINENO          #<Z>
+#setopt EXEC                 #<D>
+#setopt FUNCTION_ARGZERO     #<C> <Z>
+#setopt LOCAL_OPTIONS        #<K>
+#setopt LOCAL_TRAPS          #<K>
+#setopt MULTI_FUNC_DEF       #<Z>
+#setopt MULTIOS              #<Z>
+#setopt OCTAL_ZEROES         #<S>
+#setopt TYPESET_SILENT
+#setopt VERBOSE 
+#setopt XTRACE 
+
+## Shell Emulation
+#setopt BASH_REMATCH
+#setopt BSD_ECHO             #<S>
+#setopt CSH_JUNKIE_HISTORY   #<C>
+#setopt CSH_JUNKIE_LOOPS     #<C>
+#setopt CSH_JUNKIE_QUOTES    #<C>
+#setopt CSH_NULLCMD          #<C>
+#setopt KSH_ARRAYS           #<K> <S>
+#setopt KSH_AUTOLOAD         #<K> <S>
+#setopt KSH_OPTION_PRINT     #<K>
+#setopt KSH_TYPESET          #<K>
+#setopt KSH_ZERO_SUBSCRIPT
+#setopt POSIX_ALIASES        #<K> <S>
+#setopt POSIX_BUILTINS       #<K> <S>
+#setopt POSIX_IDENTIFIERS    #<K> <S>
+#setopt SH_FILE_EXPANSION    #<K> <S>
+#setopt SH_NULLCMD           #<K> <S>
+#setopt SH_OPTION_LETTERS    #<K> <S>
+#setopt SH_WORD_SPLIT        #<K> <S>
+#setopt TRAPS_ASYNC
+
+## Shell State
+#setopt INTERACTIVE 
+#setopt LOGIN 
+#setopt PRIVILEGED 
+#setopt RESTRICTED 
+#setopt SHIN_STDIN 
+#setopt SINGLE_COMMAND 
+
+## Zle
+#setopt BEEP                 #<D>
+#setopt COMBINING_CHARS
+#setopt EMACS
+#setopt OVERSTRIKE
+#setopt SINGLE_LINE_ZLE      #<K>
+#setopt VI
+#setopt ZLE 
+

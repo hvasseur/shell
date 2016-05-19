@@ -1,0 +1,70 @@
+#!/bin/bash
+# kate: hl zsh; space-indent on; indent-width 4;
+
+function shell_is {
+    [[ "$1" = "zsh" && -n "$ZSH_VERSION" ]] && return 0
+    [[ "$1" = "bash" && -n "$BASH_VERSION" ]] && return 0
+    return 1
+}
+
+local ARG EXT OUTDIR ARCHIVE
+for ARG in "$@"; do
+    # bug: \. should be written \\. under zsh, but not under bash
+    if [[ "$ARG" =~ \.(tar\|cpio\.)?[[:alnum:]]{1,4}$ ]]; then
+        shell_is zsh  && EXT="${MATCH#.}"
+        shell_is bash && EXT="${BASH_REMATCH[0]#.}"
+        OUTDIR="${ARG%.$EXT}"
+        OUTDIR="${OUTDIR##*/}"
+        ARCHIVE="$ARG"
+    else
+        echo "Cannot process $ARG"
+        continue
+    fi
+    case "${(L)EXT}" in
+        tar|tar.z|tar.gz|tgz|tar.bz2|tbz2|tbz|tar.xz|txz|tar.lzma|tlz)
+            tar xvf  "$ARCHIVE"              ;;
+        tar.lzo|tzo)
+            tar xv --use-compress-program=lzop -f "$ARCHIVE" ;;
+        a)
+            ar xv    "$ARCHIVE"              ;;
+        deb|ipk)
+            dpkg -X  "$ARCHIVE" "$OUTDIR"    ;;
+        rpm)
+            mkdir "$OUTDIR"
+            rpm2cpio "$ARCHIVE" | (cd "$OUTDIR"; cpio -idmv ) ;;
+        cpio)
+            mkdir "$OUTDIR"
+            cat "$ARCHIVE"      | (cd "$OUTDIR"; cpio -idmv ) ;;
+        cpio.gz)
+            mkdir "$OUTDIR"
+            zcat "$ARCHIVE"     | (cd "$OUTDIR"; cpio -idmv ) ;;
+        cpio.bz2)
+            mkdir "$OUTDIR"
+            bzcat "$ARCHIVE"    | (cd "$OUTDIR"; cpio -idmv ) ;;
+        cpio.xz|cpio.lzma)
+            mkdir "$OUTDIR"
+            xzcat "$ARCHIVE"    | (cd "$OUTDIR"; cpio -idmv ) ;;
+        cpio.lz)
+            mkdir "$OUTDIR"
+            lzcat "$ARCHIVE"    | (cd "$OUTDIR"; cpio -idmv ) ;;
+        zip|jar|war)
+            unzip    "$ARCHIVE" -d "$OUTDIR" ;;
+        rar)
+            rar x    "$ARCHIVE"    "$OUTDIR" ;;
+        7z)
+            7z x     "$ARCHIVE" -o "$OUTDIR" ;;
+        z|gz)
+            gunzip  -v "$ARCHIVE"            ;;
+        bz2)
+            bunzip2 -v "$ARCHIVE"            ;;
+        xz)
+            unxz    -v "$ARCHIVE"            ;;
+        lzma)
+            unlzma  -v "$ARCHIVE"            ;;
+        lzo)
+            unlzop  -v "$ARCHIVE"            ;;
+        *)
+            echo "Cannot process $ARG ($OUTDIR $EXT)" ;;
+    esac
+done
+
