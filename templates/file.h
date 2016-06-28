@@ -5,7 +5,7 @@
  *     - $NAME <$EMAIL>
  */
 #ifndef $FILE_UP
-# define $FILE_UP
+#define $FILE_UP
 
 $CURSOR
 

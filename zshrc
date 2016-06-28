@@ -2,6 +2,9 @@
 # Zsh configuration #
 #####################
 
+# Set  default TERM
+TERM=xterm-256color
+
 DIR=${$(print -P "%x"):A:h}
 if [[ ! -e /usr/share/terminfo/$TERM[1]/$TERM && ! -e /lib/terminfo/$TERM[1]/$TERM ]]; then
     echo "\$TERM=$TERM not found. Using TERM=xterm."
